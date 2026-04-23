@@ -1,0 +1,12 @@
+# Secrets — never commit these
+config/config.yaml
+config/ssh/id_ed25519
+config/ssh/known_hosts
+
+# Runtime data
+data/audit/*
+!data/audit/.gitkeep
+
+# Build artifacts
+mcp-ssh-bridge
+mcp.tar.gz

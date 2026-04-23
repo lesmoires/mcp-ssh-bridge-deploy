@@ -1,0 +1,41 @@
+services:
+  mcp-ssh-bridge:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mcp-ssh-bridge:local
+    container_name: mcp-ssh-bridge
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: ./config/config.yaml
+        target: /root/.config/mcp-ssh-bridge/config.yaml
+        read_only: true
+      - type: bind
+        source: ./config/ssh/id_ed25519
+        target: /root/.ssh/id_ed25519
+        read_only: true
+      - type: bind
+        source: ./config/ssh/known_hosts
+        target: /root/.ssh/known_hosts
+        read_only: true
+      - type: bind
+        source: ./data/audit
+        target: /root/.local/share/mcp-ssh-bridge/audit
+    healthcheck:
+      test: ["CMD", "mcp-ssh-bridge", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - moiria-mcp
+
+networks:
+  moiria-mcp:
+    driver: bridge

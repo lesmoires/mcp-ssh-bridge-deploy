@@ -1,0 +1,55 @@
+# MCP SSH Bridge Configuration
+# Copy this file to config.yaml and fill in your hosts.
+# DO NOT commit config.yaml with real IPs/keys to the repo.
+
+hosts:
+  # Add your hosts here:
+  # my-server:
+  #   hostname: 192.168.1.100
+  #   port: 22
+  #   user: root
+  #   auth:
+  #     type: key
+  #     path: /root/.ssh/id_ed25519
+  #   description: "My server"
+
+security:
+  # Mode: strict | standard | permissive
+  mode: strict
+  whitelist:
+    - "^ls\\s.*"
+    - "^ls$"
+    - "^df\\s.*"
+    - "^df$"
+    - "^free\\s.*"
+    - "^free$"
+    - "^uptime.*"
+    - "^cat\\s.*"
+    - "^systemctl\\s+(status|list|is-active|is-enabled).*"
+    - "^docker\\s+(ps|logs|inspect|images|network\\s+ls|volume\\s+ls).*"
+    - "^journalctl\\s+.*"
+  blacklist:
+    - "rm\\s+(-[a-zA-Z]*r|--(recursive|force))"
+    - "mkfs\\."
+    - "dd\\s+if="
+    - "curl.*\\|.*sh"
+    - "shutdown\\s"
+    - "reboot\\s"
+    - "halt\\s"
+  sanitize:
+    enabled: true
+    entropy_detection: true
+    entropy_threshold: 4.5
+  require_elicitation_on_destructive: true
+
+audit:
+  enabled: true
+  path: /root/.local/share/mcp-ssh-bridge/audit/audit.log
+  max_size_mb: 100
+  retain_days: 30
+
+limits:
+  command_timeout_seconds: 60
+  connection_timeout_seconds: 10
+  max_concurrent_commands: 5
+  max_output_chars: 20000
