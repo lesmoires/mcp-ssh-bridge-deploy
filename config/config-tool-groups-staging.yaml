@@ -1,0 +1,160 @@
+# MCP SSH Bridge Configuration - Staging (priorité haute)
+# Copy this file to config.yaml for LiteLLM staging
+# 338 tools → 243 tools (+105 from 24 groups enabled)
+
+hosts:
+  # Add your hosts here:
+  # moiria-claw:
+  #   hostname: 10.0.0.2
+  #   port: 22
+  #   user: root
+  #   auth:
+  #     type: key
+  #     path: /root/.ssh/id_ed25519
+  #   description: "Moiria Claw server"
+
+security:
+  # Mode: strict | standard | permissive
+  mode: strict
+  whitelist:
+    - "^ls\\s.*"
+    - "^ls$"
+    - "^df\\s.*"
+    - "^df$"
+    - "^free\\s.*"
+    - "^free$"
+    - "^uptime.*"
+    - "^cat\\s.*"
+    - "^systemctl\\s+(status|list|is-active|is-enabled).*"
+    - "^docker\\s+(ps|logs|inspect|images|network\\s+ls|volume\\s+ls).*"
+    - "^journalctl\\s+.*"
+    - "^kubectl\\s+(get|describe|logs|top).*"
+    - "^helm\\s+(list|status|history|install|upgrade|rollback|uninstall).*"
+  blacklist:
+    - "rm\\s+(-[a-zA-Z]*r|--(recursive|force))"
+    - "mkfs\\."
+    - "dd\\s+if="
+    - "curl.*\\|.*sh"
+    - "shutdown\\s"
+    - "reboot\\s"
+    - "halt\\s"
+    - "kubectl\\s+delete"
+    - "kubectl\\s+drain"
+  sanitize:
+    enabled: true
+    entropy_detection: true
+    entropy_threshold: 4.5
+  require_elicitation_on_destructive: true
+
+audit:
+  enabled: true
+  path: /root/.local/share/mcp-ssh-bridge/audit/audit.log
+  max_size_mb: 100
+  retain_days: 30
+
+limits:
+  command_timeout_seconds: 60
+  connection_timeout_seconds: 10
+  max_concurrent_commands: 5
+  max_output_chars: 20000
+
+# =============================================================================
+# 🔧 TOOL GROUPS - STAGING PRIORITY
+# =============================================================================
+# Enable priority groups for K8s, Vault, SSL audit, backup, etc.
+# 24 groups enabled = 243 tools (vs 338 total in v1.12.0)
+#
+# Priority haute (7 groups, 22 tools):
+#   - kubernetes: 16 tools (k8s + helm)
+#   - vault: 4 tools
+#   - network_security: 4 tools (ssl_audit, port_scan, network_capture, fail2ban)
+#   - postgresql: 2 tools (postgres_query + postgres_status)
+#   - mysql: 2 tools (mysql_query + mysql_status)
+#   - nginx: 4 tools
+#   - letsencrypt: 1 tool
+#
+# Priority moyenne (3 groups, 13 tools):
+#   - esxi: 7 tools
+#   - backup: 6 tools
+#   - podman: 6 tools
+#
+# Total: 10 groups, 35 additional tools beyond default 30 groups (~200 tools)
+# =============================================================================
+
+tool_groups:
+  groups:
+    # Priority haute
+    kubernetes: true
+    vault: true
+    network_security: true
+    postgresql: true
+    mysql: true
+    nginx: true
+    letsencrypt: true
+
+    # Priority moyenne
+    esxi: true
+    backup: true
+    podman: true
+
+    # Groups par défaut (activés implicitement)
+    # core: true
+    # file_transfer: true
+    # file_ops: true
+    # directory: true
+    # monitoring: true
+    # process: true
+    # network: true
+    # systemd: true
+    # systemd_timers: true
+    # firewall: true
+    # package: true
+    # cron: true
+    # user_management: true
+    # storage: true
+    # journald: true
+    # security_modules: true
+    # database: true
+    # redis: true
+    # mongodb: true
+    # docker: true
+    # git: true
+    # certificates: true
+    # diagnostics: true
+    # performance: true
+    # container_logs: true
+    # cron_analysis: true
+    # drift: true
+    # capacity: true
+    # incident: true
+    # runbooks: true
+    # log_aggregation: true
+    # key_management: true
+    # chatops: true
+    # templates: true
+
+    # Groups désactivés (non prioritaires pour staging)
+    # - windows: false  (36 tools - Windows servers)
+    # - awx: false  (14 tools - Ansible Tower)
+    # - ansible: false  (6 tools)
+    # - terraform: false  (5 tools)
+    # - cloud: false  (4 tools - AWS/GCP)
+    # - multicloud: false  (3 tools)
+    # - ldap: false  (5 tools)
+    # - active_directory: false  (7 tools)
+    # - hyperv: false  (10 tools)
+    # - scheduled_tasks: false  (6 tools - Windows)
+    # - windows_services: false  (9 tools)
+    # - windows_events: false  (5 tools)
+    # - windows_firewall: false  (5 tools)
+    # - iis: false  (6 tools)
+    # - windows_perf: false  (6 tools)
+    # - windows_registry: false  (5 tools)
+    # - windows_features: false  (4 tools)
+    # - windows_network: false  (4 tools)
+    # - network_equipment: false  (9 tools - Cisco/Juniper)
+    # - sessions: false  (4 tools)
+    # - tunnels: false  (3 tools)
+    # - orchestration: false  (3 tools)
+    # - alerts: false  (3 tools)
+    # - ssh_docker_compose: false  (1 tool)
