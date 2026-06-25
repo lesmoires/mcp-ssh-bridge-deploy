@@ -13,10 +13,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     rsync \
     && rm -rf /var/lib/apt/lists/*
 
+# FIX: Correct repo name — upstream is `bridge-mcp`, not `mcp-ssh-bridge`
+# The previous URL returned 404, blocking all rebuilds of this image.
+# Binary name, config schema, and exposed tools are identical.
 RUN cd /tmp \
-    && curl -fSL "https://github.com/muchiny/mcp-ssh-bridge/releases/latest/download/mcp-ssh-bridge-linux-x86_64.tar.gz" -o mcp.tar.gz \
+    && curl -fSL "https://github.com/muchiny/bridge-mcp/releases/latest/download/bridge-mcp-linux-x86_64.tar.gz" -o mcp.tar.gz \
     && tar xzf mcp.tar.gz \
-    && mv mcp-ssh-bridge /usr/local/bin/ \
+    && mv bridge-mcp /usr/local/bin/mcp-ssh-bridge \
     && chmod +x /usr/local/bin/mcp-ssh-bridge \
     && rm -rf /tmp/mcp.tar.gz
 
